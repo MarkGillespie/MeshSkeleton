@@ -2,11 +2,20 @@
 
 ![Bunny with skeleton curve displayed in code GUI](media/bunny-skeleton.jpg)
 
-This project takes in triangle meshes and uses the [CGAL library](https://www.cgal.org/) to compute their medial skeletons.
+This project takes in triangle meshes and uses the [CGAL library](https://www.cgal.org/) to compute their medial skeletons, while otherwise using [geometry-central](http://geometry-central.net/) for mesh processing and [polyscope](https://polyscope.run/) for visualization.
 
 ##  Getting started
 
-This project uses C++ with [CMAKE](https://cmake.org/), and depends on the CGAL library.
+You can clone this repo using
+```
+git clone --recursive git@github.com:MarkGillespie/MeshSkeleton.git
+```
+The `--recursive` flag tells git to also download the code for `geometry-central` and `polyscope` that this project depends on. If you forget the flag when you first clone the code, you can run the following command from inside the project to ask git to download those files.
+```
+git submodule update --init --recursive
+```
+
+This project uses C++ with [CMAKE](https://cmake.org/), and depends on the CGAL library. Instructions for getting both are provided below.
 
 ### Mac
 
