@@ -1,5 +1,6 @@
 #include "skeletonize.h"
 
+//===== CGAL configuration code
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Simple_cartesian.h>
 #include <CGAL/boost/graph/split_graph_into_polylines.h>
@@ -14,6 +15,7 @@ typedef Skeletonization::Skeleton Skeleton;
 typedef Skeleton::vertex_descriptor Skeleton_vertex;
 typedef Skeleton::edge_descriptor Skeleton_edge;
 
+//====== Helper functions to convert between types
 // convert geometry-central mesh to CGAL Polyhedron_3
 Polyhedron toCGAL(ManifoldSurfaceMesh& mesh, VertexPositionGeometry& geometry) {
     Polyhedron P;
@@ -57,6 +59,10 @@ struct list_polylines {
     void end_polyline() {}
 };
 
+//====== Important functions
+// extract a skeleton from the input mesh using CGAL's
+// Triangulated Surface Mesh Skeletonization module
+// https://doc.cgal.org/latest/Surface_mesh_skeletonization/index.html
 std::vector<std::vector<Vector3>> skeletonize(ManifoldSurfaceMesh& mesh,
                                               VertexPositionGeometry& geom) {
     // convert mesh to CGAL's data structure
