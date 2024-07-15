@@ -27,7 +27,7 @@ Polyhedron toCGAL(ManifoldSurfaceMesh& mesh, VertexPositionGeometry& geometry) {
     // Add vertices
     for (Vertex v : mesh.vertices()) {
         Vector3 pos = geometry.vertexPositions[v];
-        builder.add_vertex(Kernel::Point_3(pos.x, pos.y, pos.z));
+        builder.add_vertex(Point(pos.x, pos.y, pos.z));
     }
 
     // Add faces
