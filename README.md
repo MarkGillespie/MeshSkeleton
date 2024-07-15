@@ -1,18 +1,62 @@
-# GeometryTemplate
-A template project to get started with geometry-central and Polyscope. Copied from Nick's template [here](https://github.com/nmwsharp/gc-polyscope-project-template), but with code for googletest added in.
+# Mesh Skeleton
 
-This repo is set up as a template, but it seems the submodules don't get copied to the new project. Run `setup.sh` to set up the required submodules and to run cmake. Setup also sets up cmake to export compile commands for `clang-format`. To build the code, you can run
+![Bunny with skeleton curve displayed in code GUI](media/bunny-skeleton.jpg)
+
+This project takes in triangle meshes and uses the [CGAL library](https://www.cgal.org/) to compute their medial skeletons.
+
+##  Getting started
+
+This project uses C++ with [CMAKE](https://cmake.org/), and depends on the CGAL library.
+
+### Mac
+
+On Mac, you can get a C++ compiler by installing XCode. If you want to run the compiler from the command line in order to use a different editor, you can run the following command in the command line.
 ```
+xcode-select --install
+```
+
+You can then install CMAKE via
+```
+brew install cmake
+```
+
+and can install CGAL via
+```
+brew install cgal
+```
+More detailed instructions for cgal can be found [here](https://doc.cgal.org/latest/Manual/usage.html#secgettingcgal).
+
+### Linux
+On Linux, you can get a C++ compiler by running
+```
+sudo apt install build-essential
+```
+
+You can then install CMAKE via
+```
+sudo apt install cmake
+```
+
+and can install CGAL via
+```
+sudo apt install libcgal-dev
+```
+More detailed instructions for cgal can be found [here](https://doc.cgal.org/latest/Manual/usage.html#secgettingcgal).
+
+### Windows
+On Windows, you can install [Visual Studio](https://visualstudio.microsoft.com/) to get a C++ compiler and CMAKE support.
+
+You should be able to install CGAL using vcpkg. CGAL provides more details [here](https://doc.cgal.org/latest/Manual/windows.html) and [here](https://www.cgal.org/download/windows.html).
+
+## Compiling the code
+On mac/linux, you can set up this project with the following commands.
+```bash
+git clone --recursive git@github.com:MarkGillespie/MeshSkeleton.git
+cd MeshSkeleton
+mkdir build
 cd build
+cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
 make -j7
+bin/run ../inputs/bunny_small.obj
 ```
-
-Then run the code with
-```
-bin/run /path/to/a/mesh
-```
-
-Run the tests with
-```
-bin/test
-```
+On Windows, Visual Studio can use the provided CMake files to build and run the project.

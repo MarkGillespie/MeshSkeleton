@@ -3,35 +3,50 @@
 #include "geometrycentral/surface/simple_idt.h"
 #include "geometrycentral/surface/vertex_position_geometry.h"
 
+#include "polyscope/curve_network.h"
 #include "polyscope/polyscope.h"
 #include "polyscope/surface_mesh.h"
 
 #include "args/args.hxx"
-#include "imgui.h"
 
-#include "utils.h"
+#include "skeletonize.h"
 
 using namespace geometrycentral;
 using namespace geometrycentral::surface;
 
-// == Geometry-central data
-std::unique_ptr<ManifoldSurfaceMesh> mesh;
-std::unique_ptr<VertexPositionGeometry> geom;
+// == Geometry-central data for performing computations on
+std::unique_ptr<ManifoldSurfaceMesh> inputMesh;
+std::unique_ptr<VertexPositionGeometry> inputGeom;
 
-// Polyscope visualization handle, to quickly add data to the surface
+// == Polyscope visualization handles
 polyscope::SurfaceMesh* psMesh;
+polyscope::CurveNetwork* psSkeleton;
+
+// function to compute the mesh's skeleton and display it
+void computeSkeleton(ManifoldSurfaceMesh& mesh, VertexPositionGeometry& geom) {
+    std::vector<std::vector<Vector3>> skeleton = skeletonize(mesh, geom);
+    psSkeleton                                 = drawSkeleton(skeleton);
+
+    psMesh->setTransparency(.8);
+}
 
 // A user-defined callback, for creating control panels (etc)
 // Use ImGUI commands to build whatever you want here, see
 // https://github.com/ocornut/imgui/blob/master/imgui.h
-void myCallback() {}
+void myCallback() {
+    if (ImGui::Button("Compute Skeleton")) {
+        computeSkeleton(*inputMesh, *inputGeom);
+    }
+}
 
 int main(int argc, char** argv) {
-
+    polyscope::options::programName = "Mesh Skeletonization";
     // Configure the argument parser
-    args::ArgumentParser parser("Geometry program");
+    args::ArgumentParser parser("Mesh Skeletonization");
     args::Positional<std::string> inputFilename(parser, "mesh",
                                                 "Mesh to be processed.");
+    args::HelpFlag help(parser, "help", "Display this help menu",
+                        {'h', "help"});
 
     // Parse args
     try {
@@ -45,11 +60,14 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    std::string filename = "../../meshes/bunny_small.obj";
-    // Make sure a mesh name was given
-    if (inputFilename) {
-        filename = args::get(inputFilename);
+    if (!inputFilename) { // if no input filename was given, complain and quit
+        std::cout << "ERROR: you must provide an input mesh to skeletonize"
+                  << std::endl;
+        std::cout << parser; // print out help message
+        return 1;
     }
+
+    std::string filename = args::get(inputFilename);
 
     // Initialize polyscope
     polyscope::init();
@@ -58,22 +76,12 @@ int main(int argc, char** argv) {
     polyscope::state::userCallback = myCallback;
 
     // Load mesh
-    std::tie(mesh, geom) = readManifoldSurfaceMesh(filename);
-    std::cout << "Genus: " << mesh->genus() << std::endl;
+    std::tie(inputMesh, inputGeom) = readManifoldSurfaceMesh(filename);
 
     // Register the mesh with polyscope
     psMesh = polyscope::registerSurfaceMesh(
-        polyscope::guessNiceNameFromPath(filename), geom->vertexPositions,
-        mesh->getFaceVertexList(), polyscopePermutations(*mesh));
-
-    std::vector<double> vData;
-    vData.reserve(mesh->nVertices());
-    for (size_t iV = 0; iV < mesh->nVertices(); ++iV) {
-        vData.push_back(randomReal(0, 1));
-    }
-
-    auto q = psMesh->addVertexScalarQuantity("data", vData);
-    q->setEnabled(true);
+        polyscope::guessNiceNameFromPath(filename), inputGeom->vertexPositions,
+        inputMesh->getFaceVertexList(), polyscopePermutations(*inputMesh));
 
     // Give control to the polyscope gui
     polyscope::show();
